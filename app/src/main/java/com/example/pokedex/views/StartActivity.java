@@ -3,7 +3,6 @@ package com.example.pokedex.views;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.View;
@@ -11,13 +10,9 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.pokedex.R;
-import com.example.pokedex.entities.BasicResponse;
-import com.example.pokedex.entities.Pokemon;
 import com.example.pokedex.viewModels.StartViewModel;
 
 import java.util.Locale;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class StartActivity extends AppCompatActivity {
 
@@ -33,7 +28,6 @@ public class StartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
         String apiUrl = "https://pokeapi.co/api/v2/pokemon?limit=12&offset=0";
-        String apiUrlNext = "https://pokeapi.co/api/v2/pokemon?offset=12&limit=12";
         declareComponents();
 
         startViewModel = new ViewModelProvider(this).get(StartViewModel.class);
@@ -44,7 +38,7 @@ public class StartActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try {
-                    getPokemons(apiUrlNext, 0);
+                    getPokemons(apiUrl, 0);
                 } catch (Exception e) {
                     e.getStackTrace();
                 }
@@ -55,22 +49,13 @@ public class StartActivity extends AppCompatActivity {
     }
 
     public void getPokemons(String apiUrl, int pagination) {
-        startViewModel.loadBasicResponse(apiUrl);
+        startViewModel.setInitialPokemonResponse(apiUrl);
 
-        startViewModel.getBasicResponse().observe(this, pokemonResponse -> {
-            Pokemon[] pokemon = pokemonResponse.getResults();
-            startViewModel.loadPartialResponse(pokemon);
-        });
-
-        startViewModel.getStartResponse().observe(this, spriteUrlResponse -> {
-            startViewModel.loadCompleteResponse(spriteUrlResponse);
-        });
-
-        startViewModel.getCompleteResponse().observe(this, startCompleteResponse -> {
-            String pokemonName = startCompleteResponse.getName();
-            int pokemonId = startCompleteResponse.getId() - 1;
+        startViewModel.getCompleteResponse().observe(this, pokemonResponse -> {
+            String pokemonName = pokemonResponse.getName();
+            int pokemonId = pokemonResponse.getId() - 1;
             texts[pokemonId - (12 * pagination)].setText(pokemonName.substring(0, 1).toUpperCase(Locale.ROOT) + pokemonName.substring(1));
-            BitmapDrawable bitmapDrawable = new BitmapDrawable(getResources(), startCompleteResponse.getSpriteImg());
+            BitmapDrawable bitmapDrawable = new BitmapDrawable(getResources(), pokemonResponse.getSpriteImg());
             buttons[pokemonId - (12 * pagination)].setBackground(bitmapDrawable);
         });
     }

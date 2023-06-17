@@ -2,19 +2,19 @@ package com.example.pokedex.entities;
 
 import android.graphics.Bitmap;
 
-import androidx.annotation.Nullable;
-
-public class StartResponse {
+public class PokemonResponse {
     private String name;
+    private String pokemonUrl;
     private int id;
     private String spriteUrl;
     private Bitmap spriteImg;
 
-    private StartResponse() {
+    private PokemonResponse() {
     }
 
-    public StartResponse(String name, int id, String spriteUrl, Bitmap spriteImg) {
+    public PokemonResponse(String name, String pokemonUrl, int id, String spriteUrl, Bitmap spriteImg) {
         this.name = name;
+        this.pokemonUrl = pokemonUrl;
         this.id = id;
         this.spriteUrl = spriteUrl;
         this.spriteImg = spriteImg;
@@ -26,6 +26,14 @@ public class StartResponse {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getPokemonUrl() {
+        return pokemonUrl;
+    }
+
+    public void setPokemonUrl(String pokemonUrl) {
+        this.pokemonUrl = pokemonUrl;
     }
 
     public int getId() {
@@ -56,6 +64,7 @@ public class StartResponse {
     public String toString() {
         return "StartResponse{" +
                 "name='" + name + '\'' +
+                ", pokemonUrl='" + pokemonUrl + '\'' +
                 ", id=" + id +
                 ", spriteUrl='" + spriteUrl + '\'' +
                 ", spriteImg=" + spriteImg +
