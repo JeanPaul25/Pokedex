@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -71,7 +70,6 @@ public class StartViewModel extends ViewModel {
                     for (Future<Void> future : futures) {
                         future.get(); // Esperar a que se complete cada tarea
                     }
-
                     future.set(null);
                 } catch (Exception e) {
                     future.setException(e);
