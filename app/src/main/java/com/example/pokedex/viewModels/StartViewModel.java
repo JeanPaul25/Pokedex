@@ -2,8 +2,10 @@ package com.example.pokedex.viewModels;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -37,13 +39,14 @@ public class StartViewModel extends ViewModel {
         return completeResponseLiveData;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void setInitialPokemonResponse(String apiUrl) {
-        final SettableFuture<Void> future = SettableFuture.create();
+        final CompletableFuture<Void> future = new CompletableFuture<>();
         pokemonRepository.repoBasicResponse(apiUrl, new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 e.printStackTrace();
-                future.setException(e);
+                future.completeExceptionally(e);
             }
 
             @Override
@@ -53,37 +56,32 @@ public class StartViewModel extends ViewModel {
                     JsonElement jsonElement = JsonParser.parseString(responseBody);
                     JsonArray jsonResult = jsonElement.getAsJsonObject().getAsJsonArray("results");
 
-                    List<Callable<Void>> tasks = new ArrayList<>();
+                    List<CompletableFuture<Void>> futures = new ArrayList<>();
                     for (JsonElement result : jsonResult) {
                         String pokemonName = result.getAsJsonObject().get("name").getAsString();
                         String pokemonUrl = result.getAsJsonObject().get("url").getAsString();
                         PokemonResponse pokemonResponse = new PokemonResponse(pokemonName, pokemonUrl, 0, null, null);
-                        tasks.add(() -> {
-                            setPartialPokemonResponse(pokemonResponse);
-                            return null;
-                        });
+                        CompletableFuture<Void> future = CompletableFuture.runAsync(() -> setPartialPokemonResponse(pokemonResponse));
+                        futures.add(future);
                     }
 
-                    ExecutorService executor = Executors.newCachedThreadPool();
-                    List<Future<Void>> futures = executor.invokeAll(tasks);
-                    executor.shutdown();
-
-                    for (Future<Void> future : futures) {
-                        future.get(); // Esperar a que se complete cada tarea
-                    }
-
-                    future.set(null);
+                    CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+                    allFutures.thenAccept((Void) -> future.complete(null))
+                            .exceptionally(ex -> {
+                                future.completeExceptionally(ex);
+                                return null;
+                            });
                 } catch (Exception e) {
-                    future.setException(e);
+                    future.completeExceptionally(e);
                 }
             }
         });
 
-        try {
-            future.get(); // Esperar a que se complete la respuesta
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        future.whenComplete((result, ex) -> {
+            if (ex != null) {
+                ex.printStackTrace();
+            }
+        });
     }
 
     public void setPartialPokemonResponse(PokemonResponse pokemonResponse) {
