@@ -5,14 +5,11 @@ import android.graphics.Bitmap;
 public class PokemonResponse {
     private String name;
     private String pokemonUrl;
-    private int id;
+    private Integer id;
     private String spriteUrl;
     private Bitmap spriteImg;
 
-    private PokemonResponse() {
-    }
-
-    public PokemonResponse(String name, String pokemonUrl, int id, String spriteUrl, Bitmap spriteImg) {
+    public PokemonResponse(String name, String pokemonUrl, Integer id, String spriteUrl, Bitmap spriteImg) {
         this.name = name;
         this.pokemonUrl = pokemonUrl;
         this.id = id;
@@ -36,11 +33,11 @@ public class PokemonResponse {
         this.pokemonUrl = pokemonUrl;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

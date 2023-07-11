@@ -1,9 +1,11 @@
 package com.example.pokedex.views;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -14,46 +16,54 @@ import com.example.pokedex.viewModels.StartViewModel;
 
 import java.util.Locale;
 
+@RequiresApi(api = Build.VERSION_CODES.N)
 public class StartActivity extends AppCompatActivity {
-
-//    OkHttpClient client = new OkHttpClient();
-
 
     TextView[] texts = new TextView[15];
     Button[] buttons = new Button[15];
+    TextView txtpag;
     private StartViewModel startViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
-        String apiUrl = "https://pokeapi.co/api/v2/pokemon?limit=12&offset=0";
+        String initialApiURl = "https://pokeapi.co/api/v2/pokemon?limit=12&offset=0";
         declareComponents();
 
         startViewModel = new ViewModelProvider(this).get(StartViewModel.class);
 
-        Button btnRetry = findViewById(R.id.btnRetry);
-
-        btnRetry.setOnClickListener(new View.OnClickListener() {
+        Button btnPrev = findViewById(R.id.btnPrev);
+        btnPrev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    getPokemons(apiUrl, 0);
-                } catch (Exception e) {
-                    e.getStackTrace();
-                }
+                getPokemons(startViewModel.prevApiUrl);
             }
         });
 
-        getPokemons(apiUrl, 0);
+        Button btnNext = findViewById(R.id.btnNext);
+        btnNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getPokemons(startViewModel.nextApiUrl);
+            }
+        });
+
+        getPokemons(initialApiURl);
     }
 
-    public void getPokemons(String apiUrl, int pagination) {
+    public void getPokemons(String apiUrl) {
         startViewModel.setInitialPokemonResponse(apiUrl);
 
         startViewModel.getCompleteResponse().observe(this, pokemonResponse -> {
             String pokemonName = pokemonResponse.getName();
             int pokemonId = pokemonResponse.getId() - 1;
+            int tempId = pokemonId, pagination = 0;
+            while (tempId >= 12) {
+                tempId -= 12;
+                pagination++;
+            }
+            txtpag.setText(String.valueOf(pagination + 1));
             texts[pokemonId - (12 * pagination)].setText(pokemonName.substring(0, 1).toUpperCase(Locale.ROOT) + pokemonName.substring(1));
             BitmapDrawable bitmapDrawable = new BitmapDrawable(getResources(), pokemonResponse.getSpriteImg());
             buttons[pokemonId - (12 * pagination)].setBackground(bitmapDrawable);
@@ -86,5 +96,7 @@ public class StartActivity extends AppCompatActivity {
         texts[9] = findViewById(R.id.txt10);
         texts[10] = findViewById(R.id.txt11);
         texts[11] = findViewById(R.id.txt12);
+
+        txtpag = findViewById(R.id.txtPag);
     }
 }

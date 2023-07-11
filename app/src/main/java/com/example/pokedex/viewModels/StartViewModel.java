@@ -10,8 +10,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.google.common.util.concurrent.SettableFuture;
-
 import com.example.pokedex.entities.PokemonResponse;
 import com.example.pokedex.models.PokemonRepository;
 import com.google.gson.JsonArray;
@@ -21,11 +19,7 @@ import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -34,11 +28,13 @@ import okhttp3.Response;
 
 public class StartViewModel extends ViewModel {
     private PokemonRepository pokemonRepository = new PokemonRepository();
-    private MutableLiveData<PokemonResponse> completeResponseLiveData = new MutableLiveData<>();
 
+    private MutableLiveData<PokemonResponse> completeResponseLiveData = new MutableLiveData<>();
     public LiveData<PokemonResponse> getCompleteResponse() {
         return completeResponseLiveData;
     }
+
+    public String prevApiUrl, nextApiUrl;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void setInitialPokemonResponse(String apiUrl) {
@@ -56,12 +52,14 @@ public class StartViewModel extends ViewModel {
                     String responseBody = response.body().string();
                     JsonElement jsonElement = JsonParser.parseString(responseBody);
                     JsonArray jsonResult = jsonElement.getAsJsonObject().getAsJsonArray("results");
+                    nextApiUrl = jsonElement.getAsJsonObject().get("next").getAsString();
+                    prevApiUrl = jsonElement.getAsJsonObject().get("previous").isJsonNull() ? "" : jsonElement.getAsJsonObject().get("previous").getAsString();
 
                     List<CompletableFuture<Void>> futures = new ArrayList<>();
                     for (JsonElement result : jsonResult) {
                         String pokemonName = result.getAsJsonObject().get("name").getAsString();
                         String pokemonUrl = result.getAsJsonObject().get("url").getAsString();
-                        PokemonResponse pokemonResponse = new PokemonResponse(pokemonName, pokemonUrl, 0, null, null);
+                        PokemonResponse pokemonResponse = new PokemonResponse(pokemonName, pokemonUrl, null, null, null);
                         CompletableFuture<Void> future = CompletableFuture.runAsync(() -> setPartialPokemonResponse(pokemonResponse));
                         futures.add(future);
                     }
@@ -95,7 +93,7 @@ public class StartViewModel extends ViewModel {
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 String responseBody = response.body().string();
                 JsonElement jsonElement = JsonParser.parseString(responseBody);
-                int id = jsonElement.getAsJsonObject().get("id").getAsInt();
+                Integer id = jsonElement.getAsJsonObject().get("id").getAsInt();
                 String spriteUrl = jsonElement.getAsJsonObject().get("sprites").getAsJsonObject().get("front_default").getAsString();
                 pokemonResponse.setId(id);
                 pokemonResponse.setSpriteUrl(spriteUrl);
