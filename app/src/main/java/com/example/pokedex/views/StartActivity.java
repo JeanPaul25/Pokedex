@@ -4,6 +4,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,8 +13,10 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.pokedex.R;
+import com.example.pokedex.entities.PokemonDetail;
 import com.example.pokedex.viewModels.StartViewModel;
 
+import java.util.List;
 import java.util.Locale;
 
 @RequiresApi(api = Build.VERSION_CODES.N)
@@ -70,6 +73,12 @@ public class StartActivity extends AppCompatActivity {
         });
     }
 
+    private void openDetailActivity(String name) {
+        Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra("pokemonName", name);
+        startActivity(intent);
+    }
+
     public void declareComponents() {
         buttons[0] = findViewById(R.id.btn1);
         buttons[1] = findViewById(R.id.btn2);
@@ -98,5 +107,17 @@ public class StartActivity extends AppCompatActivity {
         texts[11] = findViewById(R.id.txt12);
 
         txtpag = findViewById(R.id.txtPag);
+
+        for (int i = 0; i < 11; i++) {
+            final int index = i;
+            buttons[i].setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    openDetailActivity(texts[index].getText().toString());
+                }
+            });
+        }
+
     }
+
 }

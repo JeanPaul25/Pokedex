@@ -11,6 +11,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.pokedex.entities.PokemonResponse;
+import com.example.pokedex.entities.PokemonDetail;
 import com.example.pokedex.models.PokemonRepository;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -28,13 +29,49 @@ import okhttp3.Response;
 
 public class StartViewModel extends ViewModel {
     private PokemonRepository pokemonRepository = new PokemonRepository();
-
     private MutableLiveData<PokemonResponse> completeResponseLiveData = new MutableLiveData<>();
+    private MutableLiveData<PokemonDetail> completeResponseLiveData2 = new MutableLiveData<>();
     public LiveData<PokemonResponse> getCompleteResponse() {
         return completeResponseLiveData;
     }
 
+    public LiveData<PokemonDetail> getCompleteResponse2() {
+        return completeResponseLiveData2;
+    }
+
     public String prevApiUrl, nextApiUrl;
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public CompletableFuture<PokemonDetail> setInitialPokemonDetailResponse(String apiUrl) {
+        final CompletableFuture<PokemonDetail> future = new CompletableFuture<>();
+        pokemonRepository.repoBasicResponse(apiUrl, new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                e.printStackTrace();
+                future.completeExceptionally(e);
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                try {
+                    String responseBody = response.body().string();
+                    JsonElement jsonElement = JsonParser.parseString(responseBody);
+                    JsonArray abilities = jsonElement.getAsJsonObject().getAsJsonArray("abilities");
+                    Integer base_experience = jsonElement.getAsJsonObject().get("base_experience").getAsInt();
+                    Integer pokemonHeight = jsonElement.getAsJsonObject().get("height").getAsInt();
+                    Integer id = jsonElement.getAsJsonObject().get("id").getAsInt();
+                    String pokemonName = jsonElement.getAsJsonObject().get("name").getAsString();
+                    String spriteUrl = jsonElement.getAsJsonObject().get("sprites").getAsJsonObject().get("front_default").getAsString();
+                    Integer pokemonWeight = jsonElement.getAsJsonObject().get("weight").getAsInt();
+                    PokemonDetail pokemonDetail = new PokemonDetail(pokemonName,id,pokemonWeight,base_experience,pokemonHeight,spriteUrl,null,abilities);
+                    future.complete(pokemonDetail);
+                } catch (Exception e) {
+                    future.completeExceptionally(e);
+                }
+            }
+        });
+        return future;
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void setInitialPokemonResponse(String apiUrl) {
@@ -117,4 +154,5 @@ public class StartViewModel extends ViewModel {
             }
         });
     }
+
 }
