@@ -4,6 +4,8 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,16 +14,20 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.pokedex.R;
+import com.example.pokedex.entities.PokemonResponse;
+import com.example.pokedex.utils.DatabaseHelper;
 import com.example.pokedex.viewModels.StartViewModel;
 
 import java.util.Locale;
 
 @RequiresApi(api = Build.VERSION_CODES.N)
-public class StartActivity extends AppCompatActivity {
+public class StartActivity extends AppCompatActivity implements View.OnClickListener {
 
-    TextView[] texts = new TextView[15];
-    Button[] buttons = new Button[15];
+    TextView[] texts = new TextView[12];
+    Button[] buttons = new Button[12];
     TextView txtpag;
+    DatabaseHelper databaseHelper;
+    SQLiteDatabase database;
     private StartViewModel startViewModel;
 
     @Override
@@ -31,25 +37,65 @@ public class StartActivity extends AppCompatActivity {
         String initialApiURl = "https://pokeapi.co/api/v2/pokemon?limit=12&offset=0";
         declareComponents();
 
+        databaseHelper = new DatabaseHelper(this);
+        database = databaseHelper.getWritableDatabase();
+
         startViewModel = new ViewModelProvider(this).get(StartViewModel.class);
 
-        Button btnPrev = findViewById(R.id.btnPrev);
-        btnPrev.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getPokemons(startViewModel.prevApiUrl);
-            }
-        });
-
-        Button btnNext = findViewById(R.id.btnNext);
-        btnNext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getPokemons(startViewModel.nextApiUrl);
-            }
-        });
-
+        for (int i = 0; i < buttons.length; i++) {
+            buttons[i].setOnClickListener(this);
+        }
+        databaseHelper.onUpgrade(database, 1, 1);
+        paginationButtons();
         getPokemons(initialApiURl);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btn1:
+                addFavourite(databaseHelper, view.getTag());
+                break;
+            case R.id.btn2:
+                addFavourite(databaseHelper, view.getTag());
+                break;
+            case R.id.btn3:
+                addFavourite(databaseHelper, view.getTag());
+                break;
+            case R.id.btn4:
+                addFavourite(databaseHelper, view.getTag());
+                break;
+            case R.id.btn5:
+                addFavourite(databaseHelper, view.getTag());
+                break;
+            case R.id.btn6:
+                addFavourite(databaseHelper, view.getTag());
+                break;
+            case R.id.btn7:
+                addFavourite(databaseHelper, view.getTag());
+                break;
+            case R.id.btn8:
+                addFavourite(databaseHelper, view.getTag());
+                break;
+            case R.id.btn9:
+                addFavourite(databaseHelper, view.getTag());
+                break;
+            case R.id.btn10:
+                addFavourite(databaseHelper, view.getTag());
+                break;
+            case R.id.btn11:
+                addFavourite(databaseHelper, view.getTag());
+                break;
+            case R.id.btn12:
+                addFavourite(databaseHelper, view.getTag());
+                break;
+        }
+    }
+
+    public void addFavourite(DatabaseHelper database, Object pokemon) {
+        System.out.println(pokemon);
+        PokemonResponse pokemonResponse = (PokemonResponse) pokemon;
+        database.createFavourite(pokemonResponse.getId(), pokemonResponse.getName(), pokemonResponse.getSpriteImg());
     }
 
     public void getPokemons(String apiUrl) {
@@ -67,6 +113,25 @@ public class StartActivity extends AppCompatActivity {
             texts[pokemonId - (12 * pagination)].setText(pokemonName.substring(0, 1).toUpperCase(Locale.ROOT) + pokemonName.substring(1));
             BitmapDrawable bitmapDrawable = new BitmapDrawable(getResources(), pokemonResponse.getSpriteImg());
             buttons[pokemonId - (12 * pagination)].setBackground(bitmapDrawable);
+            buttons[pokemonId - (12 * pagination)].setTag(pokemonResponse);
+        });
+    }
+
+    public void paginationButtons() {
+        Button btnPrev = findViewById(R.id.btnPrev);
+        btnPrev.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getPokemons(startViewModel.prevApiUrl);
+            }
+        });
+
+        Button btnNext = findViewById(R.id.btnNext);
+        btnNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getPokemons(startViewModel.nextApiUrl);
+            }
         });
     }
 
@@ -83,6 +148,7 @@ public class StartActivity extends AppCompatActivity {
         buttons[9] = findViewById(R.id.btn10);
         buttons[10] = findViewById(R.id.btn11);
         buttons[11] = findViewById(R.id.btn12);
+
 
         texts[0] = findViewById(R.id.txt1);
         texts[1] = findViewById(R.id.txt2);
