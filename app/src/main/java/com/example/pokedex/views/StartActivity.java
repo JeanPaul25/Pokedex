@@ -4,8 +4,8 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,7 +21,7 @@ import com.example.pokedex.viewModels.StartViewModel;
 import java.util.Locale;
 
 @RequiresApi(api = Build.VERSION_CODES.N)
-public class StartActivity extends AppCompatActivity implements View.OnClickListener {
+public class StartActivity extends AppCompatActivity {
 
     TextView[] texts = new TextView[12];
     Button[] buttons = new Button[12];
@@ -42,54 +42,9 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
 
         startViewModel = new ViewModelProvider(this).get(StartViewModel.class);
 
-        for (int i = 0; i < buttons.length; i++) {
-            buttons[i].setOnClickListener(this);
-        }
         databaseHelper.onUpgrade(database, 1, 1);
         paginationButtons();
         getPokemons(initialApiURl);
-    }
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.btn1:
-                addFavourite(databaseHelper, view.getTag());
-                break;
-            case R.id.btn2:
-                addFavourite(databaseHelper, view.getTag());
-                break;
-            case R.id.btn3:
-                addFavourite(databaseHelper, view.getTag());
-                break;
-            case R.id.btn4:
-                addFavourite(databaseHelper, view.getTag());
-                break;
-            case R.id.btn5:
-                addFavourite(databaseHelper, view.getTag());
-                break;
-            case R.id.btn6:
-                addFavourite(databaseHelper, view.getTag());
-                break;
-            case R.id.btn7:
-                addFavourite(databaseHelper, view.getTag());
-                break;
-            case R.id.btn8:
-                addFavourite(databaseHelper, view.getTag());
-                break;
-            case R.id.btn9:
-                addFavourite(databaseHelper, view.getTag());
-                break;
-            case R.id.btn10:
-                addFavourite(databaseHelper, view.getTag());
-                break;
-            case R.id.btn11:
-                addFavourite(databaseHelper, view.getTag());
-                break;
-            case R.id.btn12:
-                addFavourite(databaseHelper, view.getTag());
-                break;
-        }
     }
 
     public void addFavourite(DatabaseHelper database, Object pokemon) {
@@ -135,6 +90,12 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
         });
     }
 
+    private void openDetailActivity(String name) {
+        Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra("pokemonName", name);
+        startActivity(intent);
+    }
+
     public void declareComponents() {
         buttons[0] = findViewById(R.id.btn1);
         buttons[1] = findViewById(R.id.btn2);
@@ -164,5 +125,17 @@ public class StartActivity extends AppCompatActivity implements View.OnClickList
         texts[11] = findViewById(R.id.txt12);
 
         txtpag = findViewById(R.id.txtPag);
+
+        for (int i = 0; i < 11; i++) {
+            final int index = i;
+            buttons[i].setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    openDetailActivity(texts[index].getText().toString());
+                }
+            });
+        }
+
     }
+
 }
