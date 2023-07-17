@@ -42,9 +42,9 @@ public class StartViewModel extends ViewModel {
     public String prevApiUrl, nextApiUrl;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public CompletableFuture<PokemonDetail> setInitialPokemonDetailResponse(String apiUrl) {
+    public void setInitialPokemonDetailResponse(String apiUrl) {
         final CompletableFuture<PokemonDetail> future = new CompletableFuture<>();
-        pokemonRepository.repoBasicResponse(apiUrl, new Callback() {
+        pokemonRepository.repoPartialStartResponse(apiUrl, new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 e.printStackTrace();
@@ -64,13 +64,13 @@ public class StartViewModel extends ViewModel {
                     String spriteUrl = jsonElement.getAsJsonObject().get("sprites").getAsJsonObject().get("front_default").getAsString();
                     Integer pokemonWeight = jsonElement.getAsJsonObject().get("weight").getAsInt();
                     PokemonDetail pokemonDetail = new PokemonDetail(pokemonName,id,pokemonWeight,base_experience,pokemonHeight,spriteUrl,null,abilities);
+                    setCompletePokemonResponse2(pokemonDetail);
                     future.complete(pokemonDetail);
                 } catch (Exception e) {
                     future.completeExceptionally(e);
                 }
             }
         });
-        return future;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -151,6 +151,22 @@ public class StartViewModel extends ViewModel {
                 Bitmap bitmap = BitmapFactory.decodeStream(response.body().byteStream());
                 pokemonResponse.setSpriteImg(bitmap);
                 completeResponseLiveData.postValue(pokemonResponse);
+            }
+        });
+    }
+
+    public void setCompletePokemonResponse2(PokemonDetail pokemonDetail) {
+        pokemonRepository.repoCompleteStartResponse(pokemonDetail.getSpriteUrl(), new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                e.getStackTrace();
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                Bitmap bitmap = BitmapFactory.decodeStream(response.body().byteStream());
+                pokemonDetail.setSpriteImg(bitmap);
+                completeResponseLiveData2.postValue(pokemonDetail);
             }
         });
     }
