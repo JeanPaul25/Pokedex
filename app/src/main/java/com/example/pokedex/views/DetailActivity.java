@@ -1,4 +1,5 @@
 package com.example.pokedex.views;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
@@ -8,11 +9,16 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.pokedex.R;
+import com.example.pokedex.entities.PokemonDetail;
+import com.example.pokedex.entities.PokemonResponse;
+import com.example.pokedex.utils.DatabaseHelper;
 import com.example.pokedex.viewModels.StartViewModel;
 import com.google.gson.JsonArray;
 
@@ -21,12 +27,17 @@ import java.util.Locale;
 public class DetailActivity extends AppCompatActivity {
     private StartViewModel startViewModel;
     TextView name,peso,exp,altura,abilities;
+    Button btnFavourite;
     ImageView img;
-
+    DatabaseHelper databaseHelper;
+    SQLiteDatabase database;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+        databaseHelper = new DatabaseHelper(this);
+        database = databaseHelper.getWritableDatabase();
+
         String pokemonName = getIntent().getStringExtra("pokemonName");
         String apiURLpokemon = "https://pokeapi.co/api/v2/pokemon/"+pokemonName.toLowerCase();
         startViewModel = new ViewModelProvider(this).get(StartViewModel.class);
@@ -49,7 +60,14 @@ public class DetailActivity extends AppCompatActivity {
             exp.setText(pokemonBaseExperience);
             abilities.setText(pokemonAbilities.toString());
             img.setImageDrawable(bitmapDrawable);
+            btnFavourite.setTag(pokemonDetail);
         });
+    }
+
+    public void addFavourite(DatabaseHelper database, Object pokemon) {
+        System.out.println(pokemon);
+        PokemonDetail pokemonResponse = (PokemonDetail) pokemon;
+        database.createFavourite(pokemonResponse.getId(), pokemonResponse.getName(), pokemonResponse.getSpriteImg());
     }
 
     public void declareComponents(){
@@ -59,7 +77,14 @@ public class DetailActivity extends AppCompatActivity {
         abilities = findViewById(R.id.abilitiesTextView);
         exp = findViewById(R.id.expTextView);
         img = findViewById(R.id.pokemonImageView);
-    }
 
+        btnFavourite = findViewById(R.id.btnFavourite);
+        btnFavourite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addFavourite(databaseHelper, view.getTag());
+            }
+        });
+    }
 }
 
