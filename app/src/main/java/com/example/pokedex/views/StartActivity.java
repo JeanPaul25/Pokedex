@@ -25,6 +25,7 @@ public class StartActivity extends AppCompatActivity {
 
     TextView[] texts = new TextView[12];
     Button[] buttons = new Button[12];
+    Button btnFavourites;
     TextView txtpag;
     DatabaseHelper databaseHelper;
     SQLiteDatabase database;
@@ -42,7 +43,7 @@ public class StartActivity extends AppCompatActivity {
 
         startViewModel = new ViewModelProvider(this).get(StartViewModel.class);
 
-        databaseHelper.onUpgrade(database, 1, 1);
+        //databaseHelper.onUpgrade(database, 1, 1);
         paginationButtons();
         getPokemons(initialApiURl);
     }
@@ -110,6 +111,14 @@ public class StartActivity extends AppCompatActivity {
         buttons[10] = findViewById(R.id.btn11);
         buttons[11] = findViewById(R.id.btn12);
 
+        btnFavourites = findViewById(R.id.btnFavourites);
+        btnFavourites.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(StartActivity.this, FavouritesActivity.class);
+                startActivity(intent);
+            }
+        });
 
         texts[0] = findViewById(R.id.txt1);
         texts[1] = findViewById(R.id.txt2);
@@ -126,7 +135,7 @@ public class StartActivity extends AppCompatActivity {
 
         txtpag = findViewById(R.id.txtPag);
 
-        for (int i = 0; i < 11; i++) {
+        for (int i = 0; i < 12; i++) {
             final int index = i;
             buttons[i].setOnClickListener(new View.OnClickListener() {
                 @Override

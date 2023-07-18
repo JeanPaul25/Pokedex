@@ -1,4 +1,6 @@
 package com.example.pokedex.views;
+
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -23,14 +25,16 @@ import com.example.pokedex.viewModels.StartViewModel;
 import com.google.gson.JsonArray;
 
 import java.util.Locale;
+
 @RequiresApi(api = Build.VERSION_CODES.N)
 public class DetailActivity extends AppCompatActivity {
     private StartViewModel startViewModel;
-    TextView name,peso,exp,altura,abilities;
-    Button btnFavourite;
+    TextView name, peso, exp, altura, abilities;
+    Button btnFavourite, btnRegresar;
     ImageView img;
     DatabaseHelper databaseHelper;
     SQLiteDatabase database;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +43,7 @@ public class DetailActivity extends AppCompatActivity {
         database = databaseHelper.getWritableDatabase();
 
         String pokemonName = getIntent().getStringExtra("pokemonName");
-        String apiURLpokemon = "https://pokeapi.co/api/v2/pokemon/"+pokemonName.toLowerCase();
+        String apiURLpokemon = "https://pokeapi.co/api/v2/pokemon/" + pokemonName.toLowerCase();
         startViewModel = new ViewModelProvider(this).get(StartViewModel.class);
         declareComponents();
         getPokemon(apiURLpokemon);
@@ -70,13 +74,22 @@ public class DetailActivity extends AppCompatActivity {
         database.createFavourite(pokemonResponse.getId(), pokemonResponse.getName(), pokemonResponse.getSpriteImg());
     }
 
-    public void declareComponents(){
+    public void declareComponents() {
         name = findViewById(R.id.nameTextView);
         peso = findViewById(R.id.pesoTextView);
         altura = findViewById(R.id.alturaTextView);
         abilities = findViewById(R.id.abilitiesTextView);
         exp = findViewById(R.id.expTextView);
         img = findViewById(R.id.pokemonImageView);
+
+        btnRegresar = findViewById(R.id.btnRegresar);
+        btnRegresar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), StartActivity.class);
+                startActivity(intent);
+            }
+        });
 
         btnFavourite = findViewById(R.id.btnFavourite);
         btnFavourite.setOnClickListener(new View.OnClickListener() {
