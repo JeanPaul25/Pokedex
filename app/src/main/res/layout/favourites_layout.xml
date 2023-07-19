@@ -7,7 +7,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="683dp"
         android:gravity="center"
         android:orientation="horizontal"
         android:paddingVertical="5dp">
@@ -30,7 +29,8 @@
             android:id="@+id/btnSprite"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Detalles" />
+            android:text="Detalles"
+            android:textSize="10sp" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

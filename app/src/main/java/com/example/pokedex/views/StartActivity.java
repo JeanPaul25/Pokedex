@@ -48,12 +48,6 @@ public class StartActivity extends AppCompatActivity {
         getPokemons(initialApiURl);
     }
 
-    public void addFavourite(DatabaseHelper database, Object pokemon) {
-        System.out.println(pokemon);
-        PokemonResponse pokemonResponse = (PokemonResponse) pokemon;
-        database.createFavourite(pokemonResponse.getId(), pokemonResponse.getName(), pokemonResponse.getSpriteImg());
-    }
-
     public void getPokemons(String apiUrl) {
         startViewModel.setInitialPokemonResponse(apiUrl);
 

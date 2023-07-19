@@ -65,13 +65,14 @@ public class DetailActivity extends AppCompatActivity {
             abilities.setText(pokemonAbilities.toString());
             img.setImageDrawable(bitmapDrawable);
             btnFavourite.setTag(pokemonDetail);
+            defineBtnFavourite(databaseHelper.checkFavourite(pokemonDetail.getId()));
         });
     }
 
-    public void addFavourite(DatabaseHelper database, Object pokemon) {
-        System.out.println(pokemon);
-        PokemonDetail pokemonResponse = (PokemonDetail) pokemon;
-        database.createFavourite(pokemonResponse.getId(), pokemonResponse.getName(), pokemonResponse.getSpriteImg());
+    public void defineBtnFavourite(boolean isFavourite) {
+        int alpha = (isFavourite) ? 256 : 128;
+        btnFavourite.getBackground().setAlpha(alpha);
+
     }
 
     public void declareComponents() {
@@ -95,7 +96,14 @@ public class DetailActivity extends AppCompatActivity {
         btnFavourite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                addFavourite(databaseHelper, view.getTag());
+                PokemonDetail pokemonDetail = (PokemonDetail) btnFavourite.getTag();
+                boolean isFavourite = databaseHelper.checkFavourite(pokemonDetail.getId());
+                if (isFavourite) {
+                    databaseHelper.deleteData(pokemonDetail.getId());
+                } else {
+                    databaseHelper.createFavourite(pokemonDetail.getId(), pokemonDetail.getName(), pokemonDetail.getSpriteImg());
+                }
+                defineBtnFavourite(!isFavourite);
             }
         });
     }

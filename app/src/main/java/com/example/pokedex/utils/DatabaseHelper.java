@@ -44,31 +44,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public boolean createFavourite(int id, String name, Bitmap spriteImg) {
-        Cursor cursor = readFavourite();
-        boolean isCreated = false;
-        while (cursor.moveToNext()) {
-            if (cursor.getInt(0) == id) {
-                isCreated = true;
-                break;
-            }
-        }
-        if (isCreated) {
-            Toast.makeText(context, "El pokemon ya ha sido agregado", Toast.LENGTH_SHORT).show();
-        } else {
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            spriteImg.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-            byte[] spriteBytes = byteArrayOutputStream.toByteArray();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        spriteImg.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+        byte[] spriteBytes = byteArrayOutputStream.toByteArray();
 
-            SQLiteDatabase db = this.getWritableDatabase();
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(COL1, id);
-            contentValues.put(COL2, name);
-            contentValues.put(COL3, spriteBytes);
-            Long result = db.insert(TABLE_NAME, null, contentValues);
-            Toast.makeText(context, "El pokemon ha sido agregado a favoritos", Toast.LENGTH_SHORT).show();
-            return (result == -1) ? false : true;
-        }
-        return false;
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COL1, id);
+        contentValues.put(COL2, name);
+        contentValues.put(COL3, spriteBytes);
+        Long result = db.insert(TABLE_NAME, null, contentValues);
+        Toast.makeText(context, "El pokemon ha sido agregado a favoritos", Toast.LENGTH_SHORT).show();
+
+        return (result == -1) ? false : true;
     }
 
     public Cursor readFavourite() {
@@ -79,8 +67,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public boolean deleteData(int id) {
         SQLiteDatabase db = this.getWritableDatabase();
-        int rowDeleted = db.delete(TABLE_NAME, COL1, new String[]{String.valueOf(id)});
+        int rowDeleted = db.delete(TABLE_NAME, COL1 + "=?", new String[]{String.valueOf(id)});
+        Toast.makeText(context, "El pokemon ha sido eliminado de favoritos", Toast.LENGTH_SHORT).show();
         return rowDeleted > 0;
+    }
+
+    public boolean checkFavourite(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor result = db.rawQuery("select count(*) from " + TABLE_NAME + " where " + COL1 + " = " + id, null);
+        result.moveToFirst();
+        int count = result.getInt(0);
+        if (count > 0) {
+            return true;
+        }
+        return false;
     }
 }
 

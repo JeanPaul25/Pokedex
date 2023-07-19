@@ -28,7 +28,6 @@ public class FavouritesActivity extends AppCompatActivity {
     FavouritesAdapter favouritesAdapter;
     List<Favourites> pokemons = new ArrayList<>();
     Button btnRegresar;
-
     DatabaseHelper databaseHelper;
     SQLiteDatabase database;
     private Cursor pokemonCursor;
@@ -48,16 +47,13 @@ public class FavouritesActivity extends AppCompatActivity {
             }
         });
 
-
         databaseHelper = new DatabaseHelper(this);
         database = databaseHelper.getWritableDatabase();
 
         recyclerView = findViewById(R.id.recyclerView);
         pokemonCursor = databaseHelper.readFavourite();
-
         while (pokemonCursor.moveToNext()) {
             Favourites favourite = new Favourites(pokemonCursor.getInt(0), pokemonCursor.getString(1), pokemonCursor.getBlob(2));
-            System.out.println(favourite.toString());
             pokemons.add(favourite);
         }
 
