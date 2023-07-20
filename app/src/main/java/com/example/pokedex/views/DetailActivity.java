@@ -37,7 +37,7 @@ public class DetailActivity extends AppCompatActivity {
     ImageView img;
     DatabaseHelper databaseHelper;
     SQLiteDatabase database;
-    Integer i =0;
+    Integer i = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +53,24 @@ public class DetailActivity extends AppCompatActivity {
         getPokemon(apiURLpokemon);
     }
 
+    public String capitalizaText(String text) {
+        char firstLetter = Character.toUpperCase(text.charAt(0));
+        return firstLetter + text.substring(1);
+    }
+
+    public String addComa(String number) {
+        int longitud = number.length();
+        StringBuilder resultado = new StringBuilder(number);
+
+        if (longitud <= 1) {
+            resultado.insert(0, "0,");
+            return resultado.toString();
+        } else {
+            resultado.insert(longitud - 1, ",");
+            return resultado.toString();
+        }
+    }
+
     public void getPokemon(String apiUrl) {
         startViewModel.setInitialPokemonDetailResponse(apiUrl);
         startViewModel.getCompleteResponse2().observe(this, pokemonDetail -> {
@@ -61,18 +79,17 @@ public class DetailActivity extends AppCompatActivity {
             String pokemonBaseExperience = Integer.toString(pokemonDetail.getBase_experience());
             String pokemonHeight = Integer.toString(pokemonDetail.getHeight());
             BitmapDrawable bitmapDrawable = new BitmapDrawable(getResources(), pokemonDetail.getSpriteImg());
-            name.setText(pokemonName);
-            peso.setText(pokemonWeight);
-            altura.setText(pokemonHeight);
-            exp.setText(pokemonBaseExperience);
+            name.setText(capitalizaText(pokemonName));
+            peso.setText(addComa(pokemonWeight) + "kg");
+            altura.setText(addComa(pokemonHeight) + "m");
+            exp.setText(pokemonBaseExperience + "xp");
             JsonArray pokemonAbilities = pokemonDetail.getAbilities().getAsJsonArray();
             for (JsonElement abilityObj : pokemonAbilities) {
                 JsonObject ability = abilityObj.getAsJsonObject().get("ability").getAsJsonObject();
                 String abilityName = ability.get("name").getAsString();
-                abilities[i].setText(abilityName);
+                abilities[i].setText(capitalizaText(abilityName));
                 i++;
             }
-
 
             img.setImageDrawable(bitmapDrawable);
             btnFavourite.setTag(pokemonDetail);

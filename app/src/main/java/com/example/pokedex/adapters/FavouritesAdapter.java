@@ -48,11 +48,9 @@ public class FavouritesAdapter extends RecyclerView.Adapter<FavouritesAdapter.Vi
 
         byte[] bytesSprite = pokemons.get(position).getSpriteImg();
         Bitmap bitmapSprite = BitmapFactory.decodeByteArray(bytesSprite, 0, bytesSprite.length);
-//        BitmapDrawable bitmapDrawable = new BitmapDrawable(context.getResources(), bitmapSprite);
-//        holder.btnSprite.setBackground(bitmapSprite);
 
         holder.imgSprite.setImageBitmap(bitmapSprite);
-        holder.txtName.setText(name);
+        holder.txtName.setText(capitalizaText(name));
         holder.btnSprite.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
@@ -83,5 +81,10 @@ public class FavouritesAdapter extends RecyclerView.Adapter<FavouritesAdapter.Vi
             txtName = itemView.findViewById(R.id.txtName);
             imgSprite = itemView.findViewById(R.id.imgSprite);
         }
+    }
+
+    public String capitalizaText(String text) {
+        char firstLetter = Character.toUpperCase(text.charAt(0));
+        return firstLetter + text.substring(1);
     }
 }
