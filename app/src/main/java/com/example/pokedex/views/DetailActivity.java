@@ -23,17 +23,21 @@ import com.example.pokedex.entities.PokemonResponse;
 import com.example.pokedex.utils.DatabaseHelper;
 import com.example.pokedex.viewModels.StartViewModel;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import java.util.Locale;
 
 @RequiresApi(api = Build.VERSION_CODES.N)
 public class DetailActivity extends AppCompatActivity {
     private StartViewModel startViewModel;
-    TextView name, peso, exp, altura, abilities;
+    TextView name, peso, exp, altura;
+    TextView[] abilities = new TextView[3];
     Button btnFavourite, btnRegresar;
     ImageView img;
     DatabaseHelper databaseHelper;
     SQLiteDatabase database;
+    Integer i =0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,12 +61,19 @@ public class DetailActivity extends AppCompatActivity {
             String pokemonBaseExperience = Integer.toString(pokemonDetail.getBase_experience());
             String pokemonHeight = Integer.toString(pokemonDetail.getHeight());
             BitmapDrawable bitmapDrawable = new BitmapDrawable(getResources(), pokemonDetail.getSpriteImg());
-            JsonArray pokemonAbilities = pokemonDetail.getAbilities();
             name.setText(pokemonName);
             peso.setText(pokemonWeight);
             altura.setText(pokemonHeight);
             exp.setText(pokemonBaseExperience);
-            abilities.setText(pokemonAbilities.toString());
+            JsonArray pokemonAbilities = pokemonDetail.getAbilities().getAsJsonArray();
+            for (JsonElement abilityObj : pokemonAbilities) {
+                JsonObject ability = abilityObj.getAsJsonObject().get("ability").getAsJsonObject();
+                String abilityName = ability.get("name").getAsString();
+                abilities[i].setText(abilityName);
+                i++;
+            }
+
+
             img.setImageDrawable(bitmapDrawable);
             btnFavourite.setTag(pokemonDetail);
             defineBtnFavourite(databaseHelper.checkFavourite(pokemonDetail.getId()));
@@ -79,7 +90,10 @@ public class DetailActivity extends AppCompatActivity {
         name = findViewById(R.id.nameTextView);
         peso = findViewById(R.id.pesoTextView);
         altura = findViewById(R.id.alturaTextView);
-        abilities = findViewById(R.id.abilitiesTextView);
+        abilities[0] = findViewById(R.id.abilitiesTextView);
+        abilities[1] = findViewById(R.id.abilitiesTextView2);
+        abilities[2] = findViewById(R.id.abilitiesTextView3);
+
         exp = findViewById(R.id.expTextView);
         img = findViewById(R.id.pokemonImageView);
 

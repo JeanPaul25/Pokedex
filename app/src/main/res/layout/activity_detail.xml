@@ -55,18 +55,19 @@
 
                         <Button
                             android:id="@+id/btnFavourite"
-                            android:layout_width="wrap_content"
+                            android:layout_width="150dp"
                             android:layout_height="wrap_content"
                             android:layout_marginHorizontal="2.5dp"
                             android:text="Favorito" />
 
-                        <Button
-                            android:id="@+id/btnRegresar"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="2.5dp"
-                            android:text="Regresar" />
                     </LinearLayout>
+
+                    <Button
+                        android:id="@+id/btnRegresar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="2.5dp"
+                        android:text="Regresar" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -190,7 +191,7 @@
                             android:layout_height="match_parent"
                             android:layout_weight="1"
                             android:gravity="center_vertical"
-                            android:text="TextView"
+                            android:text="-"
                             android:textColor="@color/white" />
 
                         <TextView
@@ -199,7 +200,7 @@
                             android:layout_height="match_parent"
                             android:layout_weight="1"
                             android:gravity="center_vertical"
-                            android:text="TextView"
+                            android:text="-"
                             android:textColor="@color/white" />
 
                         <TextView
@@ -208,7 +209,7 @@
                             android:layout_height="match_parent"
                             android:layout_weight="1"
                             android:gravity="center_vertical"
-                            android:text="TextView"
+                            android:text="-"
                             android:textColor="@color/white" />
 
                     </LinearLayout>
